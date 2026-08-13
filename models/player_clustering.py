@@ -119,12 +119,17 @@ def build_player_stats(players: pd.DataFrame, appearances: pd.DataFrame, games: 
 
 @st.cache_data(show_spinner=False)
 def elbow_and_silhouette(df: pd.DataFrame, features: List[str], k_min: int = 2, k_max: int = 10) -> tuple[pd.DataFrame, pd.DataFrame]:
-    X = df[features].fillna(0)
+    # Silhouette is O(n^2). Always score a sample so the dashboard can render.
+    sample_n = min(len(df), 2500)
+    work = df[features].fillna(0)
+    if len(work) > sample_n:
+        work = work.sample(n=sample_n, random_state=42)
+    X = work
     scaler = StandardScaler()
     Xs = scaler.fit_transform(X)
     elbow_rows, sil_rows = [], []
     for k in range(k_min, k_max + 1):
-        km = KMeans(n_clusters=k, random_state=42, n_init=10)
+        km = KMeans(n_clusters=k, random_state=42, n_init=5)
         labels = km.fit_predict(Xs)
         elbow_rows.append({"k": k, "inertia": float(km.inertia_)})
         if len(np.unique(labels)) > 1:
@@ -148,6 +153,9 @@ def _cluster_label(row: pd.Series) -> str:
 def run_player_clustering(player_df: pd.DataFrame, k: int) -> PlayerClusteringResult:
     features = ["goals_per_90", "assists_per_90", "cards_per_90", "minutes_per_game", "market_value"]
     work = player_df.copy()
+    max_rows = 12000
+    if len(work) > max_rows:
+        work = work.nlargest(max_rows, "minutes_played") if "minutes_played" in work.columns else work.head(max_rows)
     X = work[features].fillna(0)
     scaler = StandardScaler()
     Xs = scaler.fit_transform(X)

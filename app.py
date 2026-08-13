@@ -48,6 +48,17 @@ with right:
         unsafe_allow_html=True,
     )
 
+st.markdown(
+    """
+    <div class="fifa-card">
+        <h3>SQL Analytics</h3>
+        <p>Run analyst SQL against SQLite — top scorers, head-to-head, win rates, tournament trends.</p>
+        <p><b>Navigate:</b> Pages → SQL Analytics</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 mc_ok, _ = check_match_data_availability()
 pc_ok, _ = check_player_data_availability()
 

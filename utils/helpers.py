@@ -18,6 +18,18 @@ def get_artifacts_dir() -> Path:
     return get_project_root() / "artifacts"
 
 
+def get_db_dir() -> Path:
+    return get_project_root() / "db"
+
+
+def get_db_path() -> Path:
+    return get_db_dir() / "fifa_analytics.db"
+
+
+def get_sql_dir() -> Path:
+    return get_project_root() / "sql"
+
+
 def apply_custom_css() -> None:
     css_path = get_project_root() / "assets" / "style.css"
     if css_path.exists():
@@ -26,7 +38,7 @@ def apply_custom_css() -> None:
 
 def render_top_navbar() -> None:
     st.markdown('<div class="top-nav-wrap">', unsafe_allow_html=True)
-    row = st.columns([2.2, 1, 1.3, 1.35], gap="small")
+    row = st.columns([2.0, 0.8, 1.1, 1.2, 1.1], gap="small")
     with row[0]:
         st.markdown('<div class="brand">FIFA 2026 Predictor</div>', unsafe_allow_html=True)
     with row[1]:
@@ -35,6 +47,8 @@ def render_top_navbar() -> None:
         st.page_link("pages/1_🏆_Match_Predictor.py", label="Match Predictor")
     with row[3]:
         st.page_link("pages/2_⚽_Player_Dashboard.py", label="Player Dashboard")
+    with row[4]:
+        st.page_link("pages/3_📊_SQL_Analytics.py", label="SQL Analytics")
     st.markdown("</div>", unsafe_allow_html=True)
 
 

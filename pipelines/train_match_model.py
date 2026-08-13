@@ -23,8 +23,13 @@ def parse_args() -> argparse.Namespace:
         "--model",
         dest="model_name",
         choices=["XGBoost", "Random Forest", "Gradient Boosting", "Logistic Regression"],
-        default="XGBoost",
+        default="Logistic Regression",
         help="Estimator family to train and persist.",
+    )
+    parser.add_argument(
+        "--tune",
+        action="store_true",
+        help="Run RandomizedSearchCV (can take hours). Default trains one model once.",
     )
     return parser.parse_args()
 
@@ -37,7 +42,7 @@ def main() -> int:
     ts = Path("data/results.csv").stat().st_mtime
     data_last_updated = datetime.fromtimestamp(ts, tz=timezone.utc).replace(microsecond=0).isoformat()
     logging.info("Training model: %s", args.model_name)
-    bundle = train_match_model(results, args.model_name, retrain_flag=1)
+    bundle = train_match_model(results, args.model_name, retrain_flag=1, tune=bool(args.tune))
     metrics = bundle.metrics
     saved = save_model_bundle(
         bundle=bundle,

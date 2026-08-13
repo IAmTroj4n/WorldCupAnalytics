@@ -8,8 +8,24 @@ Multi-page Streamlit app with:
 
 ```bash
 pip install -r requirements.txt
+python -m pipelines.build_sqlite_db
 streamlit run app.py
 ```
+
+## SQL analytics (SQLite)
+
+CSV files are loaded into `db/fifa_analytics.db`:
+
+```bash
+python -m pipelines.build_sqlite_db
+python -m pipelines.build_sqlite_db --force   # rebuild
+```
+
+- Schema + views: `sql/schema.sql`
+- Analyst query pack: `sql/analysis_queries.sql`
+- Streamlit page: **SQL Analytics** (run queries in the browser)
+
+Tables mirror the CSVs (`results`, `appearances`, `players`, …). Views include `player_season_stats` and `international_match_outcomes`.
 
 ## Data placement
 

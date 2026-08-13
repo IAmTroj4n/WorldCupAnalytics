@@ -53,7 +53,18 @@ def load_players() -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def load_appearances() -> pd.DataFrame:
-    return pd.read_csv(get_data_dir() / "appearances.csv")
+    cols = [
+        "game_id",
+        "player_id",
+        "player_name",
+        "competition_id",
+        "yellow_cards",
+        "red_cards",
+        "goals",
+        "assists",
+        "minutes_played",
+    ]
+    return pd.read_csv(get_data_dir() / "appearances.csv", usecols=cols)
 
 
 @st.cache_data(show_spinner=False)

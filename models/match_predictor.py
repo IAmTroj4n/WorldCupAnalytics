@@ -187,7 +187,12 @@ def _tune_xgboost(X: pd.DataFrame, y_int: pd.Series, sample_weight: np.ndarray) 
 
 
 @st.cache_resource(show_spinner=True)
-def train_match_model(results_df: pd.DataFrame, model_name: str, retrain_flag: int = 0) -> MatchModelBundle:
+def train_match_model(
+    results_df: pd.DataFrame,
+    model_name: str,
+    retrain_flag: int = 0,
+    tune: bool = False,
+) -> MatchModelBundle:
     _ = retrain_flag
     frame = build_match_features(results_df)
     frame = frame.sort_values("date")
@@ -207,16 +212,19 @@ def train_match_model(results_df: pd.DataFrame, model_name: str, retrain_flag: i
     y_valid = valid["target"]
 
     estimator = _build_model(model_name)
-    if model_name == "Random Forest":
+    if model_name == "Random Forest" and tune:
         estimator = _tune_random_forest(X_train, y_train)
     fit_y_train = y_train
     eval_y_valid = y_valid
     fit_sample_weight = None
+    best_params: dict = {}
+    cv_f1 = 0.0
     if model_name == "XGBoost":
         fit_y_train = y_train.map(LABEL_TO_INT).astype(int)
         fit_sample_weight = _compute_balanced_sample_weights(fit_y_train)
         eval_y_valid = y_valid.map(LABEL_TO_INT).astype(int)
-        estimator, best_params, cv_f1 = _tune_xgboost(X_train, fit_y_train, fit_sample_weight)
+        if tune:
+            estimator, best_params, cv_f1 = _tune_xgboost(X_train, fit_y_train, fit_sample_weight)
     steps = []
     if _needs_scaler(model_name):
         steps.append(("scaler", StandardScaler()))

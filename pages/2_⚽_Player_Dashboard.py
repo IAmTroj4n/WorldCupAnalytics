@@ -23,8 +23,11 @@ if not ok:
     render_missing_data_message("Player Dashboard data is unavailable", missing)
     st.stop()
 
-data = load_all_player_data()
-player_stats = build_player_stats(data["players"], data["appearances"], data["games"], data["clubs"], data["competitions"])
+with st.spinner("Loading player data (first visit can take a minute)..."):
+    data = load_all_player_data()
+    player_stats = build_player_stats(
+        data["players"], data["appearances"], data["games"], data["clubs"], data["competitions"]
+    )
 
 st.sidebar.header("Filters")
 competition_options = sorted(player_stats["competition_name"].dropna().astype(str).unique().tolist()) if "competition_name" in player_stats.columns else []
@@ -50,7 +53,8 @@ if filtered.empty:
     st.warning("No players match current filters. Try relaxing filters.")
     st.stop()
 
-clustered = run_player_clustering(filtered, k_clusters)
+with st.spinner("Clustering players..."):
+    clustered = run_player_clustering(filtered, k_clusters)
 df = clustered.clustered
 
 RADAR_STATS = [
